@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Brain Rot Detox Mini Game</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: radial-gradient(ellipse at top, #3a1c71 0%, #d76d77 40%, #2b86c5 100%);
+      background-color: #18122b;
+      min-height: 100vh;
+      color: #f3f6fa;
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      z-index: -1;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 60% 0%, rgba(58,28,113,0.7) 0%, rgba(39,14,63,0.8) 100%);
+      pointer-events: none;
+      opacity: 0.85;
+    }
+    h1 {
+      margin-top: 32px;
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #00eaff;
+      text-shadow: 0 2px 8px #0ff0fc60;
+      text-align: center;
+    }
+    #desc {
+      margin: 0.5em 0 1.5em 0;
+      color: #e0f7fa;
+      font-size: 1.1rem;
+      text-align: center;
+      max-width: 420px;
+    }
+    #game-area {
+      background: rgba(255,255,255,0.09);
+      border-radius: 18px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      padding: 28px 18px 18px 18px;
+      margin-bottom: 2em;
+      min-width: 320px;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    #score, #timer {
+      font-size: 1.18rem;
+      margin: 0.5em 0;
+      color: #00eaff;
+      font-weight: 700;
+    }
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(4, 60px);
+      grid-template-rows: repeat(4, 60px);
+      gap: 16px;
+      margin: 1em 0;
+    }
+    .cell-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      border: none;
+      font-size: 2rem;
+      background: #e0f7fa;
+      color: #222;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #0ff0fc30;
+      transition: transform 0.1s, background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      outline: none;
+      user-select: none;
+    }
+    .cell-btn:active {
+      transform: scale(0.92);
+      background: #b2ebf2;
+    }
+    .receh {
+      background: #ffebee;
+      color: #e53935;
+    }
+    .berkualitas {
+      background: #e0f7fa;
+      color: #009688;
+    }
+    #game-over {
+      display: none;
+      font-size: 1.3rem;
+      color: #fff;
+      background: #00eaff;
+      padding: 1em 2em;
+      border-radius: 14px;
+      margin-top: 1em;
+      box-shadow: 0 2px 12px #0ff0fc60;
+      text-align: center;
+    }
+    #restart-btn {
+      margin-top: 1.2em;
+      padding: 0.7em 2em;
+      font-size: 1.1rem;
+      background: linear-gradient(90deg, #0abde3 0%, #00d2ff 100%);
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 4px 12px #0ff0fc60;
+      transition: background 0.3s;
+      display: none;
+    }
+    #restart-btn:hover {
+      background: linear-gradient(90deg, #00d2ff 0%, #0abde3 100%);
+      color: #222;
+    }
+    @media (max-width: 600px) {
+      #game-area { min-width: 0; }
+      #grid { grid-template-columns: repeat(4, 44px); grid-template-rows: repeat(4, 44px); gap: 10px; }
+      .cell-btn { width: 44px; height: 44px; font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+ <center> <h1>🧠 Brain Rot Detox</h1></center>
+  <center><div id="desc">
+    Klik hanya ikon <b>berkualitas</b> (📚, 🏃, 🎨, 🧩) untuk menjaga otak tetap sehat.<br>
+    Hindari klik ikon <b>receh</b> (🎵, 😂, 📱, 🕺) yang bikin brain rot!<br>
+    Skor +1 jika benar, -1 jika salah. Waktu: <b>30 detik</b>.
+  </div></center>
+  <div id="game-area">
+    <div id="score">Skor: 0</div>
+    <div id="timer">Waktu: 30</div>
+    <div id="grid"></div>
+    <div id="game-over"></div>
+    <button id="restart-btn" onclick="startGame()">Main Lagi</button>
+  </div>
+  <script>
+    // Ikon berkualitas & receh
+    const berkualitas = [
+      {icon: "📚", label: "Buku"},
+      {icon: "🏃", label: "Olahraga"},
+      {icon: "🎨", label: "Seni"},
+      {icon: "🧩", label: "Puzzle"}
+    ];
+    const receh = [
+      {icon: "🎵", label: "TikTok"},
+      {icon: "😂", label: "Meme"},
+      {icon: "📱", label: "HP"},
+      {icon: "🕺", label: "Joget"}
+    ];
+
+    let score = 0;
+    let timeLeft = 30;
+    let timerInterval = null;
+    let clickable = true;
+
+    function randomCellContent() {
+      // 50% chance berkualitas, 50% receh
+      if (Math.random() < 0.5) {
+        const b = berkualitas[Math.floor(Math.random() * berkualitas.length)];
+        return {type: 'berkualitas', icon: b.icon, label: b.label};
+      } else {
+        const r = receh[Math.floor(Math.random() * receh.length)];
+        return {type: 'receh', icon: r.icon, label: r.label};
+      }
+    }
+
+    function fillGrid() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      for (let i = 0; i < 16; i++) {
+        const cell = randomCellContent();
+        const btn = document.createElement('button');
+        btn.className = 'cell-btn ' + cell.type;
+        btn.innerText = cell.icon;
+        btn.title = cell.label;
+        btn.onclick = function() {
+          if (!clickable) return;
+          if (cell.type === 'berkualitas') {
+            score++;
+          } else {
+            score--;
+          }
+          document.getElementById('score').textContent = `Skor: ${score}`;
+          // Replace this cell with new random
+          const newCell = randomCellContent();
+          btn.className = 'cell-btn ' + newCell.type;
+          btn.innerText = newCell.icon;
+          btn.title = newCell.label;
+          // Animate feedback
+          btn.style.transform = 'scale(1.15)';
+          setTimeout(() => { btn.style.transform = ''; }, 120);
+        };
+        grid.appendChild(btn);
+      }
+    }
+
+    function startGame() {
+      score = 0;
+      timeLeft = 30;
+      clickable = true;
+      document.getElementById('score').textContent = `Skor: ${score}`;
+      document.getElementById('timer').textContent = `Waktu: ${timeLeft}`;
+      document.getElementById('game-over').style.display = 'none';
+      document.getElementById('restart-btn').style.display = 'none';
+      fillGrid();
+
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = `Waktu: ${timeLeft}`;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function endGame() {
+      clickable = false;
+      document.getElementById('game-over').style.display = 'block';
+      document.getElementById('game-over').innerHTML =
+        `⏰ Waktu habis!<br>Skor akhir Anda: <b>${score}</b><br><span style="font-size:1.1em">${score >= 10 ? "Otakmu sehat! 👍" : "Ayo lebih banyak konsumsi konten berkualitas!"}</span>`;
+      document.getElementById('restart-btn').style.display = 'inline-block';
+    }
+
+    // Mulai game saat halaman dibuka
+    startGame();
+  </script>
+</body>
+</html>

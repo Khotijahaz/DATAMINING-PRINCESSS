@@ -1,0 +1,44 @@
+[
+  {
+    "kota": "Jakarta",
+    "latitude": -6.2088,
+    "longitude": 106.8456,
+    "kasus": 132
+  },
+  {
+    "kota": "Surabaya",
+    "latitude": -7.2575,
+    "longitude": 112.7521,
+    "kasus": 89
+  },
+  {
+    "kota": "Medan",
+    "latitude": 3.5952,
+    "longitude": 98.6722,
+    "kasus": 47
+  },
+  {
+    "kota": "Makassar",
+    "latitude": -5.1477,
+    "longitude": 119.4327,
+    "kasus": 65
+  },
+  {
+    "kota": "Yogyakarta",
+    "latitude": -7.7956,
+    "longitude": 110.3695,
+    "kasus": 29
+  },
+  {
+    "kota": "Bandung",
+    "latitude": -6.9147,
+    "longitude": 107.6098,
+    "kasus": 55
+  },
+  {
+    "kota": "Semarang",
+    "latitude": -6.9667,
+    "longitude": 110.4167,
+    "kasus": 41
+  }  
+]

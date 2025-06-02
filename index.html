@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BRAINMAP - Prediksi Risiko Brain Rot</title>
+  <style>
+    /* Reset some */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(ellipse at top, #3a1c71 0%, #d76d77 40%, #2b86c5 100%);
+      background-color: #18122b;
+      min-height: 100vh;
+      color: #f3f6fa;
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      z-index: -1;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 60% 0%, rgba(58,28,113,0.7) 0%, rgba(39,14,63,0.8) 100%);
+      pointer-events: none;
+      opacity: 0.85;
+    }
+    /* Navbar and header background update */
+    header {
+      background: rgba(34, 17, 51, 0.95);
+      color: #f3f6fa;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 2px solid #3a1c71;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.7rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-shadow: 0 2px 8px #2b86c5b0;
+      color: #f3f6fa;
+    }
+    header p {
+      margin: 0.3rem 0 1rem;
+      font-size: 1.18rem;
+      font-weight: 500;
+      font-style: italic;
+      text-shadow: 0 1px 2px #2b86c580;
+      color: #e0e6f7;
+    }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.8rem;
+      margin-bottom: 0.25rem;
+      background: linear-gradient(90deg, rgba(58,28,113,0.95) 0%, rgba(43,134,197,0.85) 100%);
+      border-radius: 0.7rem;
+      box-shadow: 0 2px 12px #3a1c7130;
+      padding: 0.3rem 0.5rem;
+    }
+    nav a {
+      color: #f3f6fa;
+      text-decoration: none;
+      font-weight: 700;
+      padding: 0.35rem 1rem;
+      border-radius: 0.5rem;
+      transition: background 0.3s, color 0.3s;
+      font-size: 1rem;
+      background: rgba(255,255,255,0.08);
+      border: 1.5px solid #3a1c7130;
+      box-shadow: 0 1px 4px #2b86c540;
+    }
+    nav a:hover, nav a:focus {
+      background: #fff;
+      color: #3a1c71;
+      outline: none;
+      border-color: #2b86c5;
+    }
+
+    section {
+      max-width: 900px;
+      background: rgba(34, 17, 51, 0.93);
+      margin: 1.5rem auto;
+      padding: 2.2rem 2.2rem 2rem;
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(15,32,39,0.18);
+      border: 2px solid #2b86c530;
+    }
+    section h2 {
+      color: #d76dff;
+      font-size: 2.1rem;
+      margin-bottom: 1.1rem;
+      text-align: center;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 8px #2b86c530;
+    }
+    p, ul {
+      font-size: 1.13rem;
+      margin-bottom: 1rem;
+      color: #f3f6fa;
+    }
+    ul {
+      padding-left: 1.3rem;
+      list-style: inside disc;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 1rem;
+      background: #2b2a4c;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px #3a1c7130;
+      color: #f3f6fa;
+    }
+    th, td {
+      border: 1px solid #3a1c7130;
+      padding: 0.6rem 1rem;
+      text-align: center;
+    }
+    th {
+      background: linear-gradient(90deg, #3a1c71 0%, #2b86c5 100%);
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    td {
+      background: rgba(43,134,197,0.10);
+      color: #f3f6fa;
+    }
+
+    /* Call to action button */
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(90deg, #3a1c71 0%, #2b86c5 100%);
+      color: #fff;
+      font-weight: 800;
+      padding: 0.9rem 2.2rem;
+      text-decoration: none;
+      font-size: 1.25rem;
+      border-radius: 40px;
+      box-shadow: 0 6px 18px #3a1c7160;
+      transition: background 0.3s, box-shadow 0.3s, color 0.3s;
+      margin: 1.2rem auto;
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      letter-spacing: 1px;
+    }
+    .cta-button:hover, .cta-button:focus {
+      background: linear-gradient(90deg, #2b86c5 0%, #3a1c71 100%);
+      color: #fff;
+      box-shadow: 0 10px 24px #2b86c590;
+      outline: none;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      max-width: 420px;
+      margin: 0 auto 1rem;
+      gap: 1.1rem;
+      background: #23203b;
+      border-radius: 12px;
+      padding: 1.3rem 1.5rem;
+      box-shadow: 0 2px 8px #3a1c7130;
+      border: 1.5px solid #2b86c530;
+    }
+    label {
+      font-weight: 700;
+      font-size: 1.08rem;
+      color: #d76dff;
+      margin-bottom: 0.2rem;
+    }
+    input[type=number] {
+      padding: 0.6rem;
+      font-size: 1.05rem;
+      border: 2px solid #3a1c7130;
+      border-radius: 8px;
+      transition: border-color 0.3s;
+      background: #18122b;
+      color: #f3f6fa;
+    }
+    input[type=number]:focus {
+      border-color: #d76dff;
+      outline: none;
+      background: #23203b;
+    }
+    button[type=submit] {
+      background: linear-gradient(90deg, #3a1c71 0%, #2b86c5 100%);
+      color: #fff;
+      font-size: 1.18rem;
+      font-weight: 800;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 5px 12px #3a1c7160;
+      transition: background 0.3s, box-shadow 0.3s, color 0.3s;
+      letter-spacing: 1px;
+    }
+    button[type=submit]:hover, button[type=submit]:focus {
+      background: linear-gradient(90deg, #2b86c5 0%, #3a1c71 100%);
+      color: #fff;
+      box-shadow: 0 8px 18px #2b86c590;
+      outline: none;
+    }
+
+    #hasilPrediksi {
+      margin-top: 1.2rem;
+      font-size: 1.18rem;
+      font-weight: 600;
+      border-radius: 12px;
+      padding: 1.2rem 1.5rem;
+      background: linear-gradient(120deg, #23203b 60%, #2b2a4c 100%);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 4px 18px #3a1c7130;
+      border: 2px solid #2b86c540;
+      color: #f3f6fa;
+      white-space: normal;
+      word-break: break-word;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* Images styling */
+    img {
+      display: block;
+      margin: 1rem auto;
+      border-radius: 16px;
+      max-width: 100%;
+      height: auto;
+      box-shadow: 0 6px 18px #3a1c7130;
+      border: 2px solid #3a1c7130;
+      background: #23203b;
+    }
+
+    /* Solutions cards */
+    .solutions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.2rem;
+      margin-top: 1rem;
+    }
+    .solution-card {
+      background: linear-gradient(120deg, #23203b 60%, #2b2a4c 100%);
+      border-radius: 14px;
+      padding: 1.3rem 1.1rem;
+      box-shadow: 0 6px 18px #3a1c7130;
+      flex: 1 1 220px;
+      max-width: 250px;
+      text-align: center;
+      transition: background 0.3s, box-shadow 0.3s;
+      border: 1.5px solid #2b86c530;
+    }
+    .solution-card:hover {
+      background: linear-gradient(120deg, #3a1c71 60%, #2b86c5 100%);
+      box-shadow: 0 8px 24px #2b86c540;
+    }
+    .solution-card h3 {
+      color: #d76dff;
+      margin-bottom: 0.6rem;
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .solution-card p {
+      font-size: 1.05rem;
+      color: #f3f6fa;
+      margin-bottom: 0;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.98rem;
+      color: #d1cbe9;
+      border-top: 2px solid #3a1c7130;
+      margin-top: 2rem;
+      background: rgba(34,17,51,0.85);
+      letter-spacing: 1px;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      nav {
+        gap: 0.5rem;
+      }
+      nav a {
+        font-size: 0.85rem;
+        padding: 0.2rem 0.5rem;
+      }
+      section {
+        margin: 1rem 0.5rem;
+        padding: 1rem 1rem 2rem;
+      }
+      .solutions {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      form {
+        max-width: 100%;
+        padding: 1rem 0.5rem;
+      }
+      #hasilPrediksi {
+        font-size: 1rem;
+        padding: 0.8rem;
+      }
+    }
+
+    /* Modern layout for sebaran section */
+    #sebaran-layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+    }
+    #sebaran-layout > div {
+      flex: 1 1 340px;
+      min-width: 320px;
+      max-width: 420px;
+    }
+    #sebaran-layout canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <img src="logo.jpg" alt="Logo Brainmap" style="height:64px; margin-bottom:0.7rem; display:block; margin-left:auto; margin-right:auto;">
+    <h1>BRAINMAP</h1>
+    <p>Model Prediksi Risiko Gangguan Brain Rot pada Pengguna TikTok</p>
+    <nav>
+      <a href="#home">Home</a>
+      <a href="#predict">Prediksi</a>
+      <a href="#info">Informasi</a>
+      <a href="#minigame">Mini Game</a>
+      <a href="#challenge">Challenge</a>
+      <a href="#sebaran">Sebaran</a>
+      <a href="#klasifikasi">Klasifikasi</a>
+      <a href="#about">Tentang</a>
+      <a href="#contact">Kontak</a>
+    </nav>
+  </header>
+
+  <!-- Halaman Utama -->
+  <section id="home">
+    <h2>Selamat Datang di BRAINMAP</h2>
+    <p>Website ini membantu Anda memprediksi risiko gangguan brain rot akibat penggunaan TikTok berlebih menggunakan algoritma Random Forest.</p>
+    <a href="#predict" class="cta-button">Mulai Prediksi</a>
+    <img src="hqdefault.jpg" alt="Ilustrasi Brain Rot dan TikTok" />
+  </section>
+
+  <!-- Formulir Prediksi -->
+  <section id="predict">
+    <h2>Input Data Penggunaan TikTok Anda</h2>
+    <form id="predictionForm">
+      <label for="durasi">Durasi Harian (jam):</label>
+      <input type="number" id="durasi" name="durasi" min="0" max="24" required />
+
+      <label for="frekuensi">Frekuensi Harian (kali):</label>
+      <input type="number" id="frekuensi" name="frekuensi" min="0" max="100" required />
+
+      <label for="scroll">Jumlah Scroll per Sesi:</label>
+      <input type="number" id="scroll" name="scroll" min="0" max="10000" required />
+
+      <button type="submit">Prediksi Risiko</button>
+    </form>
+    <div id="hasilPrediksi" aria-live="polite"></div>
+  </section>
+
+  <!-- Informasi tentang Brain Rot -->
+  <section id="info">
+    <h2>Apa itu Brain Rot?</h2>
+    <p>Brain Rot adalah istilah yang menggambarkan penurunan fungsi kognitif akibat konsumsi konten digital berlebihan dan kurangnya stimulasi intelektual.</p>
+    <img src="brainroot.png" alt="Ilustrasi gejala Brain Rot" />
+    <ul>
+      <li>Gejala: kurang fokus, mudah lupa, kecemasan, dan kecanduan konten.</li>
+      <li>Pemicu utama: durasi penggunaan media sosial yang berlebihan tanpa jeda.</li>
+      <li>Solusi utama ditampilkan di bawah.</li>
+    </ul>
+    <div class="solutions" aria-label="Solusi Brain Rot">
+      <div class="solution-card" tabindex="0">
+        <h3>Detoks Digital</h3>
+        <p>Kurangi waktu screen time dengan istirahat rutin dari media sosial.</p>
+      </div>
+      <div class="solution-card" tabindex="0">
+        <h3>Membaca Buku</h3>
+        <p>Stimulasi pikiran dengan membaca buku untuk meningkatkan konsentrasi.</p>
+      </div>
+      <div class="solution-card" tabindex="0">
+        <h3>Olahraga Teratur</h3>
+        <p>Aktivitas fisik membantu meningkatkan kesehatan otak dan mengurangi stres.</p>
+      </div>
+      <div class="solution-card" tabindex="0">
+        <h3>Interaksi Sosial Nyata</h3>
+        <p>Meningkatkan kualitas komunikasi di dunia nyata, bukan hanya digital.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mini Game -->
+  <section id="minigame">
+    <h2>Mini Game: Latih Otakmu!</h2>
+    <p>Berikut mini game sederhana untuk melatih konsentrasi dan kecepatan reaksi Anda.</p>
+    <a href="minigame.html">
+      <button>Mainkan Game</button>
+    </a>    
+  </section>
+
+  <!-- Challenge -->
+  <section id="challenge">
+    <h2>Brain Detox Challenge</h2>
+    <p>Ikuti tantangan bebas TikTok selama 7 hari dan catat perubahannya.</p>
+    <ul>
+      <li>Hari 1-3: Ganti waktu TikTok dengan membaca buku</li>
+      <li>Hari 4-6: Fokus pada aktivitas fisik</li>
+      <li>Hari 7: Tulis refleksi digital detox Anda</li>
+    </ul>
+  </section>
+
+  <!-- Sebaran Brain Rot -->
+  <section id="sebaran">
+    <h2>Sebaran Brain Rot & Studi Ilmiah</h2>
+    <p>
+      Visualisasi berikut menampilkan peta lokasi penelitian utama, timeline interaktif studi, dan perbandingan temuan utama dari studi-studi internasional terkait "brain rot".
+    </p>
+    <div id="sebaran-layout">
+      <div>
+        <div style="font-weight:700; color:#d76dff; margin-bottom:0.5em;">Peta Lokasi Studi</div>
+        <div id="map" style="height: 340px; border-radius: 16px; box-shadow: 0 4px 18px #0ff0fc30; background:#23203b;"></div>
+      </div>
+      <div>
+        <div style="font-weight:700; color:#d76dff; margin-bottom:0.5em;">Timeline Studi Ilmiah</div>
+        <div id="timeline" style="height: 340px; background: #23203b; border-radius: 14px; box-shadow: 0 4px 18px #0ff0fc30; padding: 0.5em;"></div>
+      </div>
+      <div>
+        <div style="font-weight:700; color:#d76dff; margin-bottom:0.5em;">Perbandingan Temuan Studi</div>
+        <canvas id="chart" style="background: #23203b; border-radius: 14px; box-shadow: 0 4px 18px #0ff0fc30; padding: 1em; width:100%; height:340px;"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- Klasifikasi Generasi -->
+  <section id="klasifikasi">
+    <h2>Klasifikasi Brain Rot per Generasi</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Generasi</th>
+          <th>Ciri Penggunaan</th>
+          <th>Risiko Brain Rot</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Gen Z</td>
+          <td>Konsumsi tinggi konten pendek, multitasking</td>
+          <td><strong>Tinggi</strong></td>
+        </tr>
+        <tr>
+          <td>Gen Milenial</td>
+          <td>Aktif di media sosial dan hiburan daring</td>
+          <td><strong>Sedang</strong></td>
+        </tr>
+        <tr>
+          <td>Gen Alpha</td>
+          <td>Tumbuh dengan layar sejak bayi</td>
+          <td><strong>Sangat Tinggi</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Tentang Penelitian -->
+  <section id="about">
+    <h2>Tentang Penelitian</h2>
+    <p>
+      Penelitian ini bertujuan untuk memahami dan memprediksi risiko gangguan kognitif yang dikenal sebagai "brain rot" akibat kebiasaan konsumsi konten digital secara intens dan berulang, khususnya pada platform TikTok. 
+    </p>
+    <ul>
+      <li>
+        <strong>Metode:</strong> Algoritma <b>Random Forest</b> digunakan untuk menganalisis data pola penggunaan TikTok, seperti durasi harian, frekuensi akses, dan jumlah scroll per sesi.
+      </li>
+      <li>
+        <strong>Tujuan:</strong> Mengidentifikasi faktor-faktor utama yang berkontribusi terhadap risiko brain rot dan memberikan prediksi tingkat risiko pada pengguna.
+      </li>
+      <li>
+        <strong>Output:</strong> Sistem memberikan rekomendasi solusi dan tantangan digital detox berbasis hasil prediksi risiko.
+      </li>
+      <li>
+        <strong>Kontribusi:</strong> Memberikan edukasi berbasis data dan membantu masyarakat lebih sadar akan pentingnya menjaga kesehatan otak di era digital.
+      </li>
+    </ul>
+  </section>
+
+  <!-- Footer -->
+  <footer id="contact">
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:1.5em;">
+      <div style="font-weight:700;color:#0abde3;font-size:1.1em;">
+        &copy; 2025 BRAINMAP Team
+      </div>
+      <div style="font-size:1.05em;">
+        <span style="margin-right:0.5em;">Follow us:</span>
+        <a href="https://www.instagram.com/" target="_blank" style="color:inherit;text-decoration:none;font-weight:700;">Instagram</a> |
+        <a href="https://www.tiktok.com/" target="_blank" style="color:inherit;text-decoration:none;font-weight:700;">TikTok</a>
+      </div>
+      <div style="font-size:0.98em;">
+        <span style="margin-right:0.5em;">Contact:</span>
+        <a href="mailto:brainmap.team@email.com" style="color:inherit;text-decoration:underline;">brainmap.team@email.com</a>
+      </div>
+    </div>
+    <div style="margin-top:0.7em;font-size:0.95em;color:#134074;">
+      <span>“Stay mindful, keep your brain healthy!”</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link href="https://unpkg.com/vis-timeline@7.7.0/dist/vis-timeline-graph2d.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/vis-timeline@7.7.0/dist/vis-timeline-graph2d.min.js"></script>
+  <script src="script.js"></script>
+  <script>
+    // Simple prediction algorithm for demo purposes
+    document.getElementById('predictionForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      let durasi = parseFloat(document.getElementById('durasi').value);
+      let frekuensi = parseInt(document.getElementById('frekuensi').value);
+      let scroll = parseInt(document.getElementById('scroll').value);
+
+      // Normalize inputs and calculate an arbitrary risk score
+      let score = 0;
+      if(!isNaN(durasi) && !isNaN(frekuensi) && !isNaN(scroll)) {
+        score = durasi * 3 + frekuensi * 2 + scroll * 0.01;
+      }
+
+      let risk = '';
+      let riskColor = '';
+      let solution = '';
+      let challengeSuggestion = '';
+
+      if (score >= 50) {
+        risk = 'Sangat Tinggi';
+        riskColor = '#ff1744'; // TikTok red accent for high risk
+        solution = 'Segera lakukan detoks digital total, kurangi penggunaan TikTok secara signifikan dan fokus pada aktivitas fisik dan interaksi sosial nyata.';
+        challengeSuggestion = `
+          <ul style="margin:0.5em 0 0 1em;">
+            <li><strong>Hari 1-3:</strong> Ganti waktu TikTok dengan membaca buku minimal 30 menit/hari.</li>
+            <li><strong>Hari 4-6:</strong> Lakukan aktivitas fisik minimal 30 menit/hari, tanpa TikTok.</li>
+            <li><strong>Hari 7:</strong> Tulis refleksi digital detox Anda dan rencanakan kebiasaan baru.</li>
+          </ul>
+        `;
+      } else if (score >= 30) {
+        risk = 'Tinggi';
+        riskColor = '#00bcd4'; // TikTok blue
+        solution = 'Kurangi durasi dan frekuensi penggunaan TikTok, lakukan detoks digital dengan memperbanyak aktivitas membaca dan olahraga.';
+        challengeSuggestion = `
+          <ul style="margin:0.5em 0 0 1em;">
+            <li><strong>Hari 1-3:</strong> Ganti waktu TikTok dengan membaca buku.</li>
+            <li><strong>Hari 4-6:</strong> Fokus pada aktivitas fisik tanpa TikTok.</li>
+          </ul>
+        `;
+      } else if (score >= 15) {
+        risk = 'Sedang';
+        riskColor = '#18ffff'; // TikTok cyan
+        solution = 'Mulailah membatasi screen time, istirahatkan pikiran dengan membaca buku dan olahraga ringan.';
+        challengeSuggestion = `
+          <ul style="margin:0.5em 0 0 1em;">
+            <li><strong>Hari 1-3:</strong> Kurangi screen time, coba membaca buku atau olahraga ringan.</li>
+          </ul>
+        `;
+      } else {
+        risk = 'Rendah';
+        riskColor = '#00e676'; // TikTok green
+        solution = 'Lanjutkan kebiasaan baik dengan menjaga keseimbangan antara digital dan aktivitas offline.';
+        challengeSuggestion = `
+          <ul style="margin:0.5em 0 0 1em;">
+            <li>Pertahankan kebiasaan baik dan lakukan detoks digital secara berkala.</li>
+          </ul>
+        `;
+      }
+
+      let hasilDiv = document.getElementById('hasilPrediksi');
+      hasilDiv.style.color = riskColor;
+      hasilDiv.style.borderColor = riskColor;
+      hasilDiv.innerHTML =
+        `<div style="color:${riskColor};font-size:1.25em;"><strong>Prediksi risiko Anda: ${risk}</strong></div>` +
+        `<div style="margin-top:0.7em;"><strong>Solusi yang disarankan:</strong><br>${solution}</div>` +
+        `<div style="margin-top:0.7em;"><strong>Rekomendasi Brain Detox Challenge:</strong>${challengeSuggestion}</div>`;
+    });
+
+    // Render visualisasi pada section sebaran setelah DOM siap
+    function renderSebaranVisuals() {
+      // --- PETA ---
+      if (document.getElementById('map') && typeof L !== "undefined") {
+        if (window._brainmapMap) { window._brainmapMap.remove(); }
+        var map = L.map('map').setView([30, 80], 2.1);
+        window._brainmapMap = map;
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        var studyMarkers = [
+          {
+            name: "Tianjin Normal University",
+            coords: [39.1042, 117.1746],
+            title: "Neuroimaging Study of Short Video Addiction (2023)",
+            authors: "Y. Liu, T. Zhang, L. Chen",
+            findings: "OFC & cerebellum, gangguan emosi & reward",
+            url: "https://www.psypost.org/does-tiktok-really-cause-brain-rot-new-study-links-short-video-addiction-to-brain-abnormalities/",
+            color: "#ff1744"
+          },
+          {
+            name: "University of California, Irvine",
+            coords: [33.6405, -117.8443],
+            title: "The Decline of Attention Span (2022)",
+            authors: "Gloria Mark",
+            findings: "Rata-rata fokus 47 detik, task switching",
+            url: "https://www.apa.org/news/podcasts/speaking-of-psychology/attention-spans",
+            color: "#00bcd4"
+          },
+          {
+            name: "Harvard Medical School",
+            coords: [42.3364, -71.1056],
+            title: "Dopamine Detoxing: Myth vs. Science (2020)",
+            authors: "Peter Grinspoon, MD",
+            findings: "Detoks dopamine tidak ilmiah, mindful tech",
+            url: "https://www.health.harvard.edu/blog/dopamine-fasting-misunderstanding-science-spawns-a-maladaptive-fad-2020022618917",
+            color: "#18ffff"
+          },
+          {
+            name: "ISTC-CNR (Italy)",
+            coords: [41.9028, 12.4964],
+            title: "Impact of Short Video Platforms on Memory (2023)",
+            authors: "F. Chiossi, C. Tavani, A. Cesta",
+            findings: "Penurunan memori prospektif >2 jam/hari",
+            url: "https://arxiv.org/abs/2302.03714",
+            color: "#ff9800"
+          }
+        ];
+
+        studyMarkers.forEach(function(study) {
+          L.circleMarker(study.coords, {
+            radius: 18,
+            color: study.color,
+            fillColor: study.color,
+            fillOpacity: 0.55,
+            weight: 3
+          }).addTo(map)
+            .bindPopup(
+              `<b>${study.title}</b><br>
+              <span style="font-size:0.95em;">${study.authors}<br>${study.name}</span><br>
+              <span style="color:#222;">${study.findings}</span><br>
+              <a href="${study.url}" target="_blank" style="color:#0abde3;">Baca sumber</a>`
+            );
+        });
+      }
+
+      // --- TIMELINE ---
+      if (document.getElementById('timeline') && typeof vis !== "undefined") {
+        if (window._brainmapTimeline) { window._brainmapTimeline.destroy(); }
+        var container = document.getElementById('timeline');
+        var items = new vis.DataSet([
+          {
+            id: 1,
+            content: `<b>2020</b><br>Dopamine Detoxing: Myth vs. Science<br><span style="font-size:0.9em;">Harvard Health Blog</span>`,
+            start: '2020-02-26',
+            title: 'Peter Grinspoon, MD'
+          },
+          {
+            id: 2,
+            content: `<b>2022</b><br>The Decline of Attention Span<br><span style="font-size:0.9em;">UC Irvine</span>`,
+            start: '2022-01-01',
+            title: 'Gloria Mark'
+          },
+          {
+            id: 3,
+            content: `<b>2023</b><br>Neuroimaging Study of Short Video Addiction<br><span style="font-size:0.9em;">Tianjin Normal Univ.</span>`,
+            start: '2023-01-01',
+            title: 'Y. Liu, T. Zhang, L. Chen'
+          },
+          {
+            id: 4,
+            content: `<b>2023</b><br>Impact of Short Video Platforms on Memory<br><span style="font-size:0.9em;">ISTC-CNR</span>`,
+            start: '2023-02-01',
+            title: 'F. Chiossi, C. Tavani, A. Cesta'
+          }
+        ]);
+        var options = {
+          width: '100%',
+          height: '320px',
+          margin: { item: 16 },
+          showMajorLabels: true,
+          showCurrentTime: false,
+          orientation: 'top',
+          stack: false,
+          zoomMin: 1000 * 60 * 60 * 24 * 365,
+          zoomMax: 1000 * 60 * 60 * 24 * 365 * 5
+        };
+        window._brainmapTimeline = new vis.Timeline(container, items, options);
+      }
+
+      // --- CHART ---
+      if (document.getElementById('chart') && typeof Chart !== "undefined") {
+        if (window._brainmapChart && window._brainmapChart.destroy) window._brainmapChart.destroy();
+        var ctx = document.getElementById('chart').getContext('2d');
+        window._brainmapChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: [
+              'Short Video Addiction (2023)',
+              'Attention Span (2022)',
+              'Dopamine Detox (2020)',
+              'Short Video & Memory (2023)'
+            ],
+            datasets: [
+              {
+                label: 'Temuan Utama',
+                data: [2, 1, 1, 1],
+                backgroundColor: [
+                  '#ff1744', '#00bcd4', '#18ffff', '#ff9800'
+                ],
+                borderRadius: 8,
+                maxBarThickness: 38
+              }
+            ]
+          },
+          options: {
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const idx = context.dataIndex;
+                    const details = [
+                      'Gangguan emosi & reward (OFC, cerebellum)',
+                      'Rata-rata fokus 47 detik (turun dari 150 detik)',
+                      'Detoks dopamine tidak ilmiah, gunakan mindful tech',
+                      'Penurunan memori prospektif >2 jam/hari short video'
+                    ];
+                    return details[idx];
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                ticks: { color: '#d76dff', font: { weight: 'bold' }, maxRotation: 30, minRotation: 0 }
+              },
+              y: {
+                display: false
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // Render visualisasi saat halaman selesai dimuat
+    window.addEventListener('DOMContentLoaded', function() {
+      renderSebaranVisuals();
+    });
+
+    // Smooth scroll with offset untuk sticky header dan render ulang visualisasi jika ke section sebaran
+    document.querySelectorAll('nav a[href^="#"]').forEach(function(link) {
+      link.addEventListener('click', function(e) {
+        const targetId = this.getAttribute('href').slice(1);
+        const target = document.getElementById(targetId);
+        if (target) {
+          e.preventDefault();
+          // Get header height
+          const header = document.querySelector('header');
+          const headerHeight = header ? header.offsetHeight : 0;
+          // Get section position
+          const sectionTop = target.getBoundingClientRect().top + window.pageYOffset;
+          // Scroll with offset
+          window.scrollTo({
+            top: sectionTop - headerHeight - 8, // 8px extra spacing
+            behavior: 'smooth'
+          });
+          // Jika menuju section sebaran, render ulang visualisasi
+          if (targetId === 'sebaran') {
+            setTimeout(renderSebaranVisuals, 350);
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+
